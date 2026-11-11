@@ -225,6 +225,7 @@ if (typeof chrome !== "undefined" && chrome.storage && chrome.tabs && chrome.run
     download.disabled = true;
     download.textContent = "Downloading...";
     setStatus("Looking for the presentation");
+    chrome.runtime.sendMessage({ type: "ms-progress", detail: "Looking for the presentation" });
     try {
       const [active] = await chrome.tabs.query({ active: true, currentWindow: true });
       const located = await locatePresentation(active);
@@ -259,7 +260,9 @@ if (typeof chrome !== "undefined" && chrome.storage && chrome.tabs && chrome.run
       busy = false;
       download.disabled = false;
       download.textContent = ACTION_LABEL;
-      setStatus(error && error.message ? error.message : "Couldn't start the script", true);
+      const text = error && error.message ? error.message : "Couldn't start the script";
+      setStatus(text, true);
+      chrome.runtime.sendMessage({ type: "ms-result", ok: false, error: text });
     }
   });
 }

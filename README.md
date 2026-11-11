@@ -15,7 +15,7 @@ After changing files, reload the extension, then reload the Moodle tab.
 ## Use
 
 1. Open the presentation in Moodle so the slides are visible. A new slide window can stay in the background.
-2. Click the extension icon on the course tab or the presentation window, then **Download presentation**.
+2. Click the extension icon on the course tab or the presentation window, then **Download presentation**. Progress stays in a Chrome notification after the popup closes. The extension icon shows the file count.
 3. Unzip the archive.
 4. Run `Open_Presentation.bat`.
 
@@ -28,4 +28,4 @@ If the package contains `lms/Configuration.js`, the extension switches it to run
 - `popup.html`, `popup.js`, `popup.css` — extension popup
 - `exporter.js` — finds files, builds the ZIP, and starts the download
 - `content.js` — forwards progress from the page to the popup
-- `background.js` — switches to the window where the slides are already open
+- `background.js` — switches to the slide window and keeps the download notification
