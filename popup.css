@@ -1,0 +1,97 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  width: 280px;
+  background: #12182c;
+  color: #e8eaf2;
+  font: 14px/1.4 "Segoe UI", sans-serif;
+}
+
+main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 12px;
+}
+
+.logo {
+  width: 36px;
+  height: 36px;
+  padding: 5px;
+  background: #f3f5fb;
+  border-radius: 8px;
+  object-fit: contain;
+  flex: none;
+}
+
+.copy {
+  min-width: 0;
+  flex: 1;
+}
+
+h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+p {
+  margin: 2px 0 0;
+  color: #aeb6cc;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+p.error { color: #ffb4c0; }
+
+button {
+  display: block;
+  width: calc(100% - 20px);
+  height: 36px;
+  margin: 0 10px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #2a64d6;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) { background: #3b74e0; }
+
+button:disabled {
+  background: #3a425e;
+  color: #aeb6cc;
+  cursor: default;
+}
+
+.github {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 10px 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #e8eaf2;
+  text-decoration: none;
+  background: #1a2240;
+}
+
+.github:hover { background: #243056; }
+
+.github svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  flex: none;
+}
+
+.github span {
+  font-size: 13px;
+  font-weight: 600;
+}

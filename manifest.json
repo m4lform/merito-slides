@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Merito Slides",
+  "version": "0.1.1",
+  "description": "Downloads an interactive Merito Moodle presentation for offline playback.",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": ["https://moodle2.e-wsb.pl/*"],
+  "action": {
+    "default_title": "Merito Slides",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://moodle2.e-wsb.pl/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
