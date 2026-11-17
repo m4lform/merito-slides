@@ -244,7 +244,7 @@
           if (cleanUrl === currentUrl) entryName = relPath;
           files.push({ name: relPath, data: maybePatch(relPath, bytes) });
           downloaded += 1;
-          if (downloaded % 20 === 0) reportProgress("Downloaded " + downloaded + " files");
+          if (downloaded === 1 || downloaded % 10 === 0) reportProgress("Downloaded " + downloaded + " files");
         } catch {
         }
       }
@@ -283,6 +283,7 @@
     reportProgress("Downloading files");
     const pack = await downloadAll(urls, seeded, baseUrl, currentUrl);
     if (!pack.downloaded) throw new Error("No presentation files found");
+    reportProgress("Downloaded " + pack.downloaded + " files");
 
     pack.files.push({
       name: "Open_Presentation.bat",

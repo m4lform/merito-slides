@@ -194,21 +194,41 @@ if (typeof chrome !== "undefined" && chrome.storage && chrome.tabs && chrome.run
     })
     .catch(() => {});
 
+  function checkActiveDownload() {
+    if (!currentTabId) return;
+    chrome.runtime.sendMessage({ type: "ms-get-state", tabId: currentTabId }, (response) => {
+      if (chrome.runtime.lastError || !response || !response.busy) return;
+      busy = true;
+      download.disabled = true;
+      download.textContent = "Downloading...";
+      if (response.detail) setStatus(response.detail);
+    });
+  }
+
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const active = tabs && tabs[0];
     findPresentationTab(active)
       .then((presentation) => {
         if (!busy) render(active, presentation);
+        checkActiveDownload();
       })
       .catch(() => {
         if (!busy) render(active, null);
+        checkActiveDownload();
       });
   });
 
   chrome.runtime.onMessage.addListener((message, sender) => {
-    if (!message || !sender.tab || sender.tab.id !== currentTabId) return;
+    if (!message) return;
+    const tabId = (sender && sender.tab && sender.tab.id) || message.tabId;
+    if (tabId && currentTabId && tabId !== currentTabId) return;
+    if (!currentTabId && tabId) currentTabId = tabId;
+
     if (message.type === "ms-progress") {
-      if (busy && message.detail) setStatus(message.detail);
+      busy = true;
+      download.disabled = true;
+      download.textContent = "Downloading...";
+      if (message.detail) setStatus(message.detail);
       return;
     }
     if (message.type !== "ms-result") return;
@@ -225,11 +245,19 @@ if (typeof chrome !== "undefined" && chrome.storage && chrome.tabs && chrome.run
     download.disabled = true;
     download.textContent = "Downloading...";
     setStatus("Looking for the presentation");
-    chrome.runtime.sendMessage({ type: "ms-progress", detail: "Looking for the presentation" });
+    chrome.runtime.sendMessage({
+      type: "ms-progress",
+      tabId: currentTabId,
+      detail: "Looking for the presentation",
+    });
     try {
       const [active] = await chrome.tabs.query({ active: true, currentWindow: true });
+      const prevTabId = currentTabId;
       const located = await locatePresentation(active);
       currentTabId = located.tab.id;
+      if (prevTabId && prevTabId !== currentTabId) {
+        chrome.runtime.sendMessage({ type: "ms-clear", tabId: prevTabId });
+      }
       currentTitle = (located.tab.title || currentTitle).replace(/\s+\|\s+.*$/, "").trim();
       const target = { tabId: located.tab.id, frameIds: [located.frameId] };
       await chrome.scripting.executeScript({
@@ -262,7 +290,12 @@ if (typeof chrome !== "undefined" && chrome.storage && chrome.tabs && chrome.run
       download.textContent = ACTION_LABEL;
       const text = error && error.message ? error.message : "Couldn't start the script";
       setStatus(text, true);
-      chrome.runtime.sendMessage({ type: "ms-result", ok: false, error: text });
+      chrome.runtime.sendMessage({
+        type: "ms-result",
+        tabId: currentTabId,
+        ok: false,
+        error: text,
+      });
     }
   });
 }
