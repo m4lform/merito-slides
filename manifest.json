@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Merito Slides",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Downloads an interactive Merito Moodle presentation for offline playback.",
   "permissions": ["storage", "scripting", "activeTab", "notifications"],
   "host_permissions": ["https://moodle2.e-wsb.pl/*"],

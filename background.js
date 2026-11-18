@@ -44,18 +44,20 @@ function showStatus(message, stick) {
 }
 
 function showBadge(text, color, tabId) {
+  if (!tabId) return;
   cancelClearTimer(tabId);
   try {
-    const details = { text: text || "" };
-    if (tabId) details.tabId = tabId;
-    const p1 = chrome.action.setBadgeText(details);
+    const p1 = chrome.action.setBadgeText({ text: text || "", tabId });
     if (p1 && typeof p1.catch === "function") p1.catch(() => {});
 
     if (color) {
-      const colorDetails = { color };
-      if (tabId) colorDetails.tabId = tabId;
-      const p2 = chrome.action.setBadgeBackgroundColor(colorDetails);
+      const p2 = chrome.action.setBadgeBackgroundColor({ color, tabId });
       if (p2 && typeof p2.catch === "function") p2.catch(() => {});
+    }
+
+    if (chrome.action.setBadgeTextColor) {
+      const p3 = chrome.action.setBadgeTextColor({ color: "#ffffff", tabId });
+      if (p3 && typeof p3.catch === "function") p3.catch(() => {});
     }
   } catch {
   }
@@ -89,7 +91,7 @@ chrome.runtime.onStartup.addListener(() => {
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (changeInfo.status === "loading") {
+  if (changeInfo.status === "loading" || changeInfo.url) {
     clearBadge(tabId);
     activeDownloads.delete(tabId);
   }
@@ -101,6 +103,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
+  clearBadge(0);
   for (const [tabId] of clearTimers.entries()) {
     if (tabId !== activeInfo.tabId) {
       clearBadge(tabId);
@@ -116,6 +119,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "ms-get-state") {
     const queryTabId = message.tabId || tabId;
     const state = activeDownloads.get(queryTabId) || { busy: false };
+    clearBadge(0);
+    if (queryTabId && !state.busy && !clearTimers.has(queryTabId)) {
+      clearBadge(queryTabId);
+    }
     sendResponse(state);
     return true;
   }
